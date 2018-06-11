@@ -3,6 +3,7 @@ package pro.anant.android.stopwatch2;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,13 +13,27 @@ public class StopwatchActivity extends Activity {
 
     private int seconds = 0;
     private boolean running;
+    private boolean wasRunning;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stopwatch);
+        if(savedInstanceState != null){
+            seconds = savedInstanceState.getInt("seconds");
+            running = savedInstanceState.getBoolean("running");
+            wasRunning = savedInstanceState.getBoolean("wasRunning");
+        }
         runTimer();
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putInt("seconds", seconds);
+        savedInstanceState.putBoolean("running", running);
+        savedInstanceState.putBoolean("wasRunning", wasRunning);
+    }
+
     public void onClickStart(View view){
         running = true;
     }
@@ -51,4 +66,20 @@ public class StopwatchActivity extends Activity {
         });
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(running){
+            wasRunning = true;
+        }
+        running  = false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(wasRunning){
+            running = true;
+        }
+    }
 }
